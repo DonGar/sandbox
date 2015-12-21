@@ -1,0 +1,32 @@
+#!/bin/bash
+
+SUBLIME=${SUBLIME:-sublime_text}
+SUBLIME_LIB_DIR=${SUBLIME_LIB_DIR:-~/lib/sublime}
+
+# Use a 'default' project if we aren't in a sandbox.
+SANDBOX=${SANDBOX:-default}
+
+# Select a project file, and give it default contents.
+PROJECT_FILE="${SUBLIME_LIB_DIR}/${SANDBOX}.sublime-project"
+if [ ! -f "${PROJECT_FILE}" ]; then
+
+  # We have to know where we are running from, to find the default
+  # project file. See: http://stackoverflow.com/questions/59895
+  SOURCE="${BASH_SOURCE[0]}"
+  while [ -h "$SOURCE" ]; do
+    SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+  done
+  SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+  # Create the new project file from our generic template.
+  mkdir -p "${SUBLIME_LIB_DIR}"
+  cat "${SCRIPT_DIR}/PROJECT_TEMPLATE" \
+    sed -i "s|SANDBOX_DIR|${SANDBOX_DIR}|" \
+    > "${PROJECT_FILE}"
+fi
+
+# Start sublime.
+LANG=en_US.UTF-8 "${SUBLIME}" --project "${PROJECT_FILE}" $@ \
+    >& /dev/null & disown

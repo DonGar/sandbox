@@ -1,0 +1,52 @@
+
+# Default deveopment root directory.
+export DEV_ROOT=${DEV_ROOT:-~/sand}
+
+function src {
+  if [ -n "${SANDBOX_DIR}" ]; then
+    cd "${SANDBOX_DIR}"
+  fi
+}
+
+function code {
+  if [ -n "${SANDBOX_DIR}" ]; then
+    src
+    if [ -e "${SANDBOX_DIR}/.code" ]; then
+      cd "$(< "${SANDBOX_DIR}/".code)"
+    fi
+  fi
+}
+
+function g {
+  # SANDBOX is a unique ID for the sandbox.
+  # SANDBOX_DIR is the root dir of the sandbox.
+  export SANDBOX=${1}
+  export SANDBOX_DIR="${DEV_ROOT}/${1}"
+
+  if [ ! -e "${SANDBOX_DIR}" ]; then
+    echo "${SANDBOX_DIR} doesn't exist."
+    return 1
+  fi
+
+  if [ -e "${SANDBOX_DIR}/.devenv" ]; then
+    . "${SANDBOX_DIR}/.devenv"
+  fi
+
+  export PS1="${SANDBOX}\$"
+  code
+}
+
+_g()
+{
+  local cur prev opts
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  opts=`ls "${DEV_ROOT}"`
+
+  COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+  return 0
+}
+
+# Setup command line completion for g
+complete -F _g g

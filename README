@@ -1,0 +1,56 @@
+
+The 'g' command will take to you any development sandbox directory
+inside 'SANDBOX_ROOT' (with tab completion). It will set 'SANDBOX' to
+the name of the sandbox (directory name), and SANDBOX_DIR to the root
+of the sandbox.
+
+When entering a sandbox ".devenv" is sourced. This allows you to set
+additional variables as needed (GOPATH, etc), enter a virtualenv, or
+whatever else is needed for the project in question.
+
+The alias 'src' will take you to the root of the current sandbox. The
+alias 'code' will take you to directory present in the .code file in
+the root of the sandbox. The idea is that src takes you to the root,
+and code takes you to the part of the code you are working in most
+actively.
+
+The sublime wrapper will auto-create / use a new project file for each
+sandbox.
+
+To use the sandbox aware sublime wrapper, invoke:
+  "${SANDBOX_ROOT}/sandbox/sublime/sublime" directory, via alias, or
+  via path.
+
+This will use a sublime project/workspace file for the current sandbox
+(and created it, if needed), and store it in a location other than the
+sandbox.
+
+
+General ENVS:
+  SANDBOX_ROOT: root directory for sandboxes. Default ~/sand
+
+  SUBLIME: Name of sublime executable, possibly with path. Default
+           sublime_text.
+
+  SUBLIME_LIB_DIR: Directory in which to store project files for sandboxes.
+                   Default ~/lib/sublime
+
+
+
+;;                                                                          ;; Run M-x desktop-save manually for each sandbox to init the process.
+;;
+
+;; Pick the name of the save file.
+;; Example: .emacs.desktop.my-sand
+(setq desktop-base-file-name
+  (concat
+   ".emacs.desktop."
+   (getenv "SANDBOX")))
+
+(setq desktop-base-lock-name
+  (concat
+   desktop-base-file-name
+   ".lock"))
+
+(setq desktop-path '("~"))
+(desktop-save-mode t)
