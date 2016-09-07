@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# How do we invoke the real sublime binary? Override in bash setup if needed.
+SUBLIME=${SUBLIME:-sublime_text}
+
+# Where do we store project files? Override in bash setup if needed.
+SUBLIME_LIB_DIR=${SUBLIME_LIB_DIR:-~/lib/sublime}
+
+# Use a 'default' project if we aren't in a sandbox.
+SANDBOX=${SANDBOX:-default}
+
+# Select a project file.
+PROJECT_FILE="${SUBLIME_LIB_DIR}/${SANDBOX}.sublime-project"
+
+# Create, if it doesn't exist.
+if [ ! -f "${PROJECT_FILE}" ]; then
+  # Create the new project file from our generic template.
+  mkdir -p "${SUBLIME_LIB_DIR}"
+  cat "${SANDBOX_ROOT}/lib/SANDBOX_PROJECT_TEMPLATE" \
+    sed -i "s|SANDBOX_DIR|${SANDBOX_DIR}|" \
+    > "${PROJECT_FILE}"
+fi
+
+# Start sublime.
+LANG=en_US.UTF-8 "${SUBLIME}" --project "${PROJECT_FILE}" $@ \
+    >& /dev/null & disown

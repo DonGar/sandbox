@@ -1,56 +1,50 @@
 
-The 'g' command will take to you any development sandbox directory
-inside 'SANDBOX_ROOT' (with tab completion). It will set 'SANDBOX' to
-the name of the sandbox (directory name), and SANDBOX_DIR to the root
-of the sandbox.
+This project gives an easy way to switch between development projects and setup
+your environment as needed for each one.
 
-When entering a sandbox ".devenv" is sourced. This allows you to set
-additional variables as needed (GOPATH, etc), enter a virtualenv, or
-whatever else is needed for the project in question.
+General:
 
-The alias 'src' will take you to the root of the current sandbox. The
-alias 'code' will take you to directory present in the .code file in
-the root of the sandbox. The idea is that src takes you to the root,
-and code takes you to the part of the code you are working in most
-actively.
+The 'g' command will take to you any development sandbox directory inside
+'SANDBOXES_ROOT' (with tab completion). It will set 'SANDBOX' to the name of the
+sandbox (directory name), and SANDBOX_DIR to the root of the sandbox. It will
+change the command prompt to SANDBOX.
 
-The sublime wrapper will auto-create / use a new project file for each
-sandbox.
+'.sandbox' is sourced when entering a sandbox. put whatever custom commands .you
+need here (export GOPATH, entering virtualenv or a chroot, etc). If you export
+'SANDBOX_DEFAULT' you will jump directly to that directory instead of the root.
 
-To use the sandbox aware sublime wrapper, invoke:
-  "${SANDBOX_ROOT}/sandbox/sublime/sublime" directory, via alias, or
-  via path.
+The 'g' command with no arguments will take you to the SANDBOX_DEFAULT directory
+of the current sandbox.
 
-This will use a sublime project/workspace file for the current sandbox
-(and created it, if needed), and store it in a location other than the
-sandbox.
+The 'src' command will jump directly to the root of the current sandbox.
+
+Sublime:
+
+The script "sublime" will invoke sublime_text with a per-sandbox project file
+(which is autocreated if necessary).
+
+SANDBOX and SANDBOX_DIR are used by the "sublime" wrapper to create or use a
+per-sandbox project file.
+
+Emacs:
+
+emacs.README shows how to have the emacs 'desktop' feature also adjust to your
+current sandbox.
 
 
-General ENVS:
-  SANDBOX_ROOT: root directory for sandboxes. Default ~/sand
+Setup:
 
-  SUBLIME: Name of sublime executable, possibly with path. Default
-           sublime_text.
+Set any of the config variables you want to change from default, then
+source 'bashrc' from your .bashrc file.
+
+  . "${HOME}/sand/sandbox/bashrc"
+
+
+Config ENVS:
+  SANDBOXES_ROOT: root directory for sandboxes. Default ~/sand
+
+  SUBLIME: Name of sublime executable (usually /custom/path/sublime_text).
+           Default 'sublime_text'.
 
   SUBLIME_LIB_DIR: Directory in which to store project files for sandboxes.
                    Default ~/lib/sublime
-
-
-
-;;                                                                          ;; Run M-x desktop-save manually for each sandbox to init the process.
-;;
-
-;; Pick the name of the save file.
-;; Example: .emacs.desktop.my-sand
-(setq desktop-base-file-name
-  (concat
-   ".emacs.desktop."
-   (getenv "SANDBOX")))
-
-(setq desktop-base-lock-name
-  (concat
-   desktop-base-file-name
-   ".lock"))
-
-(setq desktop-path '("~"))
-(desktop-save-mode t)
