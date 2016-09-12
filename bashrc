@@ -32,10 +32,6 @@ function g {
     if [ -e "${SANDBOX_DIR}/.sandbox" ]; then
       . "${SANDBOX_DIR}/.sandbox"
     fi
-
-    # Terminal is user@host: path, prompt is sandbox$
-    export PS1="\[\e]0;\u@\h: \w\a\]${SANDBOX}\$"
-
   fi
 
   # If we still don't have a sandbox, error out.

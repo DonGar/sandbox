@@ -1,35 +1,48 @@
 
-This project gives an easy way to switch between development projects and setup
-your environment as needed for each one.
+This project gives an easy way to switch between development projects
+and setup your environment as needed for each one.
 
 General:
 
-The 'g' command will take to you any development sandbox directory inside
-'SANDBOXES_ROOT' (with tab completion). It will set 'SANDBOX' to the name of the
-sandbox (directory name), and SANDBOX_DIR to the root of the sandbox. It will
-change the command prompt to SANDBOX.
+The 'g' command will take to you any development sandbox directory
+inside 'SANDBOXES_ROOT' (with tab completion). It will set 'SANDBOX'
+to the name of the sandbox (directory name), and SANDBOX_DIR to the
+root of the sandbox.
 
-'.sandbox' is sourced when entering a sandbox. put whatever custom commands .you
-need here (export GOPATH, entering virtualenv or a chroot, etc). If you export
-'SANDBOX_DEFAULT' you will jump directly to that directory instead of the root.
+'.sandbox' is sourced when entering a sandbox. put whatever custom
+commands .you need here (export GOPATH, entering virtualenv or a
+chroot, etc). If you export 'SANDBOX_DEFAULT' you will jump directly
+to that directory instead of the root.
 
-The 'g' command with no arguments will take you to the SANDBOX_DEFAULT directory
-of the current sandbox.
+The 'g' command with no arguments will take you to the SANDBOX_DEFAULT
+directory of the current sandbox.
 
 The 'src' command will jump directly to the root of the current sandbox.
 
 Sublime:
 
-The script "sublime" will invoke sublime_text with a per-sandbox project file
-(which is autocreated if necessary).
+The script "sublime" will invoke sublime_text with a per-sandbox
+project file (which is autocreated if necessary).
 
-SANDBOX and SANDBOX_DIR are used by the "sublime" wrapper to create or use a
-per-sandbox project file.
+SANDBOX and SANDBOX_DIR are used by the "sublime" wrapper to create or
+use a per-sandbox project file.
 
 Emacs:
 
-emacs.README shows how to have the emacs 'desktop' feature also adjust to your
-current sandbox.
+emacs.README shows how to have the emacs 'desktop' feature also adjust
+to your current sandbox.
+
+Command Prompt:
+
+You can set your prompt to include the current sandbox with:
+
+function _sandbox {
+  [ -n "$SANDBOX" ] && echo "($SANDBOX)" || echo "$USER"
+}
+export PS1="\[\e]0;\u@\h: \w\a\]\$(_sandbox)\$"
+
+export PS1="\[\e]0;\u@\h: \w\a\]\${SANDBOX:-$USER}\$"
+
 
 
 Setup:
