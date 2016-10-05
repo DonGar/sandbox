@@ -6,12 +6,6 @@ export SANDBOXES_ROOT=${SANDBOXES_ROOT:-~/sand}
 # Add sandbox/bin to end of path.
 export PATH="$PATH:$(dirname "${BASH_SOURCE}")/bin"
 
-function src {
-  if [ -n "${SANDBOX_DIR}" ]; then
-    cd "${SANDBOX_DIR}"
-  fi
-}
-
 function g {
 
   # If a new sandbox was specified, set up the environment.

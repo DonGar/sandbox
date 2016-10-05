@@ -17,8 +17,6 @@ to that directory instead of the root.
 The 'g' command with no arguments will take you to the SANDBOX_DEFAULT
 directory of the current sandbox.
 
-The 'src' command will jump directly to the root of the current sandbox.
-
 Sublime:
 
 The script "sublime" will invoke sublime_text with a per-sandbox
