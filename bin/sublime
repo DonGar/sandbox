@@ -14,11 +14,21 @@ PROJECT_FILE="${SUBLIME_LIB_DIR}/${SANDBOX}.sublime-project"
 
 # Create, if it doesn't exist.
 if [ ! -f "${PROJECT_FILE}" ]; then
-  # Create the new project file from our generic template.
+  # Make sure we have somewhere to put the project file.
   mkdir -p "${SUBLIME_LIB_DIR}"
-  cat "${SANDBOX_ROOT}/lib/SANDBOX_PROJECT_TEMPLATE" \
-    sed -i "s|SANDBOX_DIR|${SANDBOX_DIR}|" \
-    > "${PROJECT_FILE}"
+
+  # Create the project file from an inline template.
+  cat > "${PROJECT_FILE}" <<EOF
+{
+  "folders":
+  [
+    {
+      "path": "${SANDBOX_DIR}",
+      "folder_exclude_patterns": []
+    }
+  ]
+}
+EOF
 fi
 
 # Start sublime.
