@@ -41,7 +41,14 @@ export PS1="\[\e]0;\u@\h: \w\a\]\$(_sandbox)\$"
 
 export PS1="\[\e]0;\u@\h: \w\a\]\${SANDBOX:-$USER}\$"
 
-
+Atom:
+  function a() {
+    if [[ "${SANDBOX_DEFAULT}" != "${SANDBOX_DIR}" ]]; then
+      atom -n "${SANDBOX_DIR}/${SANDBOX_DEFAULT}" "${SANDBOX_DIR}"
+    else
+      atom -n "${SANDBOX_DIR}"
+    fi
+  }
 
 Setup:
 

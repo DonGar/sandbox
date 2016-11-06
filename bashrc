@@ -6,6 +6,17 @@ export SANDBOXES_ROOT=${SANDBOXES_ROOT:-~/sand}
 # Add sandbox/bin to end of path.
 export PATH="$PATH:$(dirname "${BASH_SOURCE}")/bin"
 
+function _joinrel {
+    local base="$1"
+    local rel="$2"
+
+    if [[ "${rel}" == /* ]] ; then
+	echo "${rel}"
+    else
+	echo "${base%/}/${rel}"
+    fi
+}
+
 function g {
 
   # If a new sandbox was specified, set up the environment.
@@ -26,15 +37,16 @@ function g {
     if [ -e "${SANDBOX_DIR}/.sandbox" ]; then
       . "${SANDBOX_DIR}/.sandbox"
     fi
-  fi
+
+    # If .sandbox defines SANDBOX_DEFAULT as a relative path, make it absolute.
+    export SANDBOX_DEFAULT="$(_joinrel "${SANDBOX_DIR}" "${SANDBOX_DEFAULT}")"
+fi
 
   # If we still don't have a sandbox, error out.
   if [ -z "${SANDBOX_DIR}" ]; then
     return 1
   fi
 
-  #
-  cd "${SANDBOX_DIR}"
   cd "${SANDBOX_DEFAULT}"
 }
 
