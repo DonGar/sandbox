@@ -40,14 +40,21 @@ function g {
 
     # If .sandbox defines SANDBOX_DEFAULT as a relative path, make it absolute.
     export SANDBOX_DEFAULT="$(_joinrel "${SANDBOX_DIR}" "${SANDBOX_DEFAULT}")"
-fi
+  fi
 
   # If we still don't have a sandbox, error out.
   if [ -z "${SANDBOX_DIR}" ]; then
     return 1
   fi
 
-  cd "${SANDBOX_DEFAULT}"
+  # We get here after entering a sandbox, or on a bare 'g'.
+
+  # Toggle between default directory, and root directory of sandbox.
+  if [ "${PWD}" = "${SANDBOX_DEFAULT}" ]; then
+    cd "${SANDBOX_DIR}"
+  else
+    cd "${SANDBOX_DEFAULT}"
+  fi
 }
 
 _g()
