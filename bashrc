@@ -59,7 +59,7 @@ complete -F _g g
 #
 # Setup used inside a SANDBOX specific nested shell.
 #
-if [ -n "${SANDBOX}" ]; then
+if [ -n "${SANDBOX}" -a -z "${SANDBOX_DIR}" ]; then
 
   function g {
     # If we are inside a sandbox, all we do is change directories.
