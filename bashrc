@@ -20,6 +20,10 @@ export PATH="$PATH:$(dirname "${BASH_SOURCE}")/bin"
 # Default deveopment root directory.  Override in bash setup to move.
 export SANDBOXES_ROOT=${SANDBOXES_ROOT:-~/sand}
 
+function sandbox_exists {
+  [ -n "${1}" -a -e "${SANDBOXES_ROOT}/${1}" ]
+}
+
 function g {
   # Try to enter a sandbox.
   if [ -z "${1}" ]; then
