@@ -87,6 +87,9 @@ if [ -n "${SANDBOX}" -a -z "${SANDBOX_DIR}" ]; then
 
   export PS1="($SANDBOX)\$"
 
+  # Start in the default directory.
+  cd "${SANDBOX_DEFAULT}"
+
   if type "sandbox_enter" >& /dev/null; then
     sandbox_enter
   fi
