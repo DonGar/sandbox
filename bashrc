@@ -98,6 +98,9 @@ if [ -n "${SANDBOX}" -a -z "${SANDBOX_DIR}" ]; then
     . "${SANDBOX_DIR}/.sandbox"
     # If .sandbox changes SANDBOX_DEFAULT, make sure its absolute.
     export SANDBOX_DEFAULT="$(_joinrel "${SANDBOX_DIR}" "${SANDBOX_DEFAULT}")"
+  elif [ -e "${SANDBOX_DIR}/venv/bin/activate" ]; then
+    # Enter a python virtual environment, if it exists.
+    source venv/bin/activate
   fi
 
   # Start in the default directory.
