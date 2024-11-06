@@ -103,6 +103,8 @@ if [ -n "${SANDBOX}" -a -z "${SANDBOX_DIR}" ]; then
     source venv/bin/activate
   fi
 
+  HISTFILE="${SANDBOX_DEFAULT}/.bash_history"
+
   # Start in the default directory.
   cd "${SANDBOX_DEFAULT}"
 fi
