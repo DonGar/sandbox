@@ -14,14 +14,11 @@ function _joinrel {
   fi
 }
 
-# Adjust path
-export PATH="$PATH:$(dirname "${BASH_SOURCE}")/bin"
-
-# Default deveopment root directory.  Override in bash setup to move.
+# Default development root directory.  Override in bash setup to move.
 export SANDBOXES_ROOT=${SANDBOXES_ROOT:-~/sand}
 
 function sandbox_exists {
-  [ -n "${1}" -a -e "${SANDBOXES_ROOT}/${1}" ]
+  [[ -n "${1}" && -d "${SANDBOXES_ROOT}/${1}" ]]
 }
 
 function g {
@@ -31,12 +28,7 @@ function g {
     return 1
   fi
 
-  if [ ! -e "${SANDBOXES_ROOT}/${1}" ]; then
-    echo "${SANDBOXES_ROOT}/${1} doesn't exist."
-    return 1
-  fi
-
-  if [ ! -e "${SANDBOXES_ROOT}/${1}" ]; then
+  if ! sandbox_exists "${1}"; then
     echo "${SANDBOXES_ROOT}/${1} doesn't exist."
     return 1
   fi
@@ -47,13 +39,15 @@ function g {
 
 _g()
 {
-  local cur prev opts
-  COMPREPLY=()
-  cur="${COMP_WORDS[COMP_CWORD]}"
-  prev="${COMP_WORDS[COMP_CWORD-1]}"
-  opts=`ls "${SANDBOXES_ROOT}"`
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local dir
+  local opts=()
 
-  COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+  for dir in "${SANDBOXES_ROOT}"/*/; do
+    [ -d "${dir}" ] && opts+=("$(basename "${dir}")")
+  done
+
+  COMPREPLY=( $(compgen -W "${opts[*]}" -- "${cur}") )
   return 0
 }
 
@@ -61,12 +55,51 @@ _g()
 complete -F _g g
 
 #
-# Setup used inside a SANDBOX specific nested shell.
+# Setup done once, in the nested shell started by 'g'.
 #
-if [ -n "${SANDBOX}" -a -z "${SANDBOX_DIR}" ]; then
+if [[ -n "${SANDBOX}" && -z "${SANDBOX_DIR}" ]]; then
+
+  if ! sandbox_exists "${SANDBOX}"; then
+    echo "Sandbox '${SANDBOX}' doesn't exist in ${SANDBOXES_ROOT}."
+  fi
+
+  # SANDBOX_DIR is the root dir of the sandbox.
+  # SANDBOX_DEFAULT is the default directory to jump to in sandbox.
+  export SANDBOX_DIR="${SANDBOXES_ROOT}/${SANDBOX}"
+  export SANDBOX_DEFAULT="${SANDBOX_DIR}"
+
+  export PS1="($SANDBOX)\$"
+
+  # Start in the sandbox root, so .sandbox can use relative paths.
+  cd "${SANDBOX_DIR}"
+
+  if type "sandbox_enter" >& /dev/null; then
+    sandbox_enter
+  fi
+
+  if [ -e "${SANDBOX_DIR}/.sandbox" ]; then
+    . "${SANDBOX_DIR}/.sandbox"
+    # If .sandbox changes SANDBOX_DEFAULT, make sure its absolute.
+    export SANDBOX_DEFAULT="$(_joinrel "${SANDBOX_DIR}" "${SANDBOX_DEFAULT}")"
+  elif [ -e "${SANDBOX_DIR}/venv/bin/activate" ]; then
+    # Enter a python virtual environment, if it exists.
+    source "${SANDBOX_DIR}/venv/bin/activate"
+  fi
+
+  # Keep bash history per sandbox.
+  HISTFILE="${SANDBOX_DIR}/.bash_history"
+
+  # Start in the default directory.
+  cd "${SANDBOX_DEFAULT}"
+fi
+
+#
+# Inside a sandbox (including shells nested inside one), 'g' only changes
+# directories.
+#
+if [ -n "${SANDBOX_DIR}" ]; then
 
   function g {
-    # If we are inside a sandbox, all we do is change directories.
     if [ -n "${1}" ]; then
       echo 'Exit current sandbox before entering a new one.'
       return 1
@@ -79,32 +112,4 @@ if [ -n "${SANDBOX}" -a -z "${SANDBOX_DIR}" ]; then
       cd "${SANDBOX_DEFAULT}"
     fi
   }
-
-  # SANDBOX_DIR is the root dir of the sandbox.
-  # SANDBOX_DEFAULT is the default directory to jump to in sandbox.
-  export SANDBOX_DIR="${SANDBOXES_ROOT}/${SANDBOX}"
-  export SANDBOX_DEFAULT="${SANDBOX_DIR}"
-
-  export PS1="($SANDBOX)\$"
-
-  # Start in the default directory.
-  cd "${SANDBOX_DEFAULT}"
-
-  if type "sandbox_enter" >& /dev/null; then
-    sandbox_enter
-  fi
-
-  if [ -e "${SANDBOX_DIR}/.sandbox" ]; then
-    . "${SANDBOX_DIR}/.sandbox"
-    # If .sandbox changes SANDBOX_DEFAULT, make sure its absolute.
-    export SANDBOX_DEFAULT="$(_joinrel "${SANDBOX_DIR}" "${SANDBOX_DEFAULT}")"
-  elif [ -e "${SANDBOX_DIR}/venv/bin/activate" ]; then
-    # Enter a python virtual environment, if it exists.
-    source venv/bin/activate
-  fi
-
-  HISTFILE="${SANDBOX_DEFAULT}/.bash_history"
-
-  # Start in the default directory.
-  cd "${SANDBOX_DEFAULT}"
 fi

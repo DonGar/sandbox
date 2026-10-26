@@ -1,13 +1,13 @@
 # sandbox
 
-##What It Does
+## What It Does
 
 This project lets you quickly and easily switch to, and setup your bash
 environment for many different software projects.
 
 The environment for each project is called a sandbox.
 
-##Setup
+## Setup
 
 * Create a directory to hold your projects. By default ~/sand
 * Create a directory for each project. The directory name is the sandbox name.
@@ -17,11 +17,15 @@ cd ~/sand
 git clone https://github.com/DonGar/sandbox.git
 ```
 * Add this line as the final line in ~/.bashrc
-```. "${HOME}/sand/sandbox/bashrc"```
+```
+. "${HOME}/sand/sandbox/bashrc"
+```
 * Start a new shell, and enter the sandbox for this project.
-```g sandbox```
+```
+g sandbox
+```
 
-##Usage
+## Usage
 
 * g *tab* will autocomplete against all valid sandbox names.
 * g *sandbox_name* will switch to that project.
@@ -35,16 +39,18 @@ git clone https://github.com/DonGar/sandbox.git
   * Exiting the shell ('exit' or Ctrl-D) will exit the shell, restoring your
     starting environment.
 
-####Alternative Usage
+#### Alternative Usage
 
-Setting SANDBOX to a valid sandbox name and starting bash is equivalent to "go
-*sandbox*". This allows you do do things like:
+Setting SANDBOX to a valid sandbox name and starting bash is equivalent to "g
+*sandbox*". This allows you to do things like:
 
-```SANDBOX=name gnome-terminal```
+```
+SANDBOX=name gnome-terminal
+```
 
-##Customize a Sandbox with .sandbox
+## Customize a Sandbox with .sandbox
 
-When a sandbox is entered, the file '.sandbox' in it's root directory will be
+When a sandbox is entered, the file '.sandbox' in its root directory will be
 sourced (if present).
 
 Example .sandbox:
@@ -60,30 +66,36 @@ project.
 
 .sandbox can also be used for things like activating python virtualenvs.
 
+## Automatic Behavior
+
+* Python: If there is no .sandbox file, and the sandbox contains
+  venv/bin/activate, that virtualenv is activated automatically.
+* History: Bash history is kept per sandbox, in SANDBOX_DIR/.bash_history.
+  You may want to add .bash_history to the project's .gitignore.
+
 Since you exit the shell when you exit the sandbox, none of these changes will
 stick around longer than needed.
 
 
-##General Customization
+## General Customization
 
 Set these in your .bashrc before importing the sandbox/bashrc.
 
-* SANDBOX_DIR: If set, this changes the sandbox root directory from the ~/sand
-               default.
+* SANDBOXES_ROOT: If set, this changes the directory holding all sandboxes
+                  from the ~/sand default. (Don't set SANDBOX_DIR yourself; it
+                  is set automatically inside a sandbox.)
 * sandbox_enter: This function or script is invoked (if it exists) when entering
-                 any sandbox. This example makes bash history sandbox
-                 specific, and preserves some of my special prompt formatting
-                 inside sandboxes.
+                 any sandbox. This example preserves some of my special prompt
+                 formatting inside sandboxes.
 
 ```
-export HISTFILE="${HISTFILE}.${SANDBOX}"
 export PS1="\[\e]0;\u@\h: \w\a\](\$SANDBOX)\$"
 ```
 
-##Emacs
+## Emacs
 
 Emacs desktops save/restore the list of open files. Add this block to your
-.emacs file do to this on a per-sandbox basis. Usually requires "M-x desktop-
+.emacs file to do this on a per-sandbox basis. Usually requires "M-x desktop-
 save" once in each sandbox to start auto save/restore.
 
 ```
@@ -94,17 +106,3 @@ save" once in each sandbox to start auto save/restore.
       desktop-save 'if-exists)
 (desktop-save-mode 1)
 ```
-
-##Sublime
-
-This project adds a script into your path named "sublime". This starts the
-sublime editor. If started inside a sandbox, it uses a project file specific to
-that project. If no project file exists, it creates a minimal one.
-
-Configuration:
-
-* SUBLIME: Name of sublime executable. Only needed if it's not in your path.
-           Default 'sublime_text'.
-
-* SUBLIME_LIB_DIR: Directory in which to store project files for sandboxes.
-                   Default ~/lib/sublime
