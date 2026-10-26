@@ -39,6 +39,15 @@ g sandbox
   * Exiting the shell ('exit' or Ctrl-D) will exit the shell, restoring your
     starting environment.
 
+* g *sandbox_name* *command* [*args*...] runs a single command inside that
+  sandbox, then exits. The sandbox is set up exactly as it would be for an
+  interactive shell (.sandbox, venv, sandbox_enter), and the command starts in
+  SANDBOX_DEFAULT. The exit status is the command's.
+  * Example: ```g ansible ls -l```
+  * Arguments are passed through exactly, so for pipes or multiple commands
+    use: ```g ansible bash -c 'make && ls'```
+  * This only works from outside a sandbox.
+
 #### Alternative Usage
 
 Setting SANDBOX to a valid sandbox name and starting bash is equivalent to "g

@@ -33,8 +33,18 @@ function g {
     return 1
   fi
 
-  # Create a nested inner bash instance with SANDBOX set.
-  SANDBOX=${1} bash
+  local name="${1}"
+  shift
+
+  if [ $# -eq 0 ]; then
+    # Create a nested inner bash instance with SANDBOX set.
+    SANDBOX="${name}" bash
+  else
+    # Run one command inside the sandbox, then exit with its status.
+    # -i makes bash read ~/.bashrc, which sets up the sandbox. Arguments
+    # are re-quoted so they reach the command exactly as given.
+    SANDBOX="${name}" bash -ic "$(printf '%q ' "$@")"
+  fi
 }
 
 _g()
@@ -42,6 +52,18 @@ _g()
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local dir
   local opts=()
+
+  # After the sandbox name, complete a command and its arguments.
+  if [ "${COMP_CWORD}" -gt 1 ]; then
+    if declare -F _command_offset >& /dev/null; then
+      _command_offset 2
+    elif [ "${COMP_CWORD}" -eq 2 ]; then
+      COMPREPLY=( $(compgen -c -- "${cur}") )
+    else
+      COMPREPLY=( $(compgen -f -- "${cur}") )
+    fi
+    return 0
+  fi
 
   for dir in "${SANDBOXES_ROOT}"/*/; do
     [ -d "${dir}" ] && opts+=("$(basename "${dir}")")
