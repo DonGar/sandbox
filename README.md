@@ -82,6 +82,15 @@ project.
 * History: Bash history is kept per sandbox, in SANDBOX_DIR/.bash_history.
   You may want to add .bash_history to the project's .gitignore.
 
+* tmux: Inside a sandbox, 'tmux', 'tmux attach' and 'tmux new' (with no other
+  arguments) attach to a tmux session named after the sandbox, creating it
+  first if it doesn't exist. Every shell in that session is set up as a
+  sandbox shell. Any other tmux command is passed through unchanged, and
+  'command tmux' always gets you plain tmux.
+  * The tmux server keeps the environment of the shell that first started it.
+    If that was a sandbox shell, variables it exported (from .sandbox) are
+    also visible in the tmux sessions of other sandboxes.
+
 Since you exit the shell when you exit the sandbox, none of these changes will
 stick around longer than needed.
 

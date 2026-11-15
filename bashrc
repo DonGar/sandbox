@@ -134,4 +134,33 @@ if [ -n "${SANDBOX_DIR}" ]; then
       cd "${SANDBOX_DEFAULT}"
     fi
   }
+
+  # Each sandbox has one tmux session, named after it. 'tmux', 'tmux attach'
+  # and 'tmux new' (with no other arguments) attach to that session, creating
+  # it first if needed. Anything else is passed to tmux unchanged.
+  function tmux {
+    # Inside tmux already, there is nothing to attach to: act as plain tmux.
+    if [ -n "${TMUX}" ]; then
+      command tmux "$@"
+      return
+    fi
+
+    if [ $# -gt 1 ]; then
+      command tmux "$@"
+      return
+    fi
+
+    case "${1}" in
+      ''|a|at|att|atta|attac|attach|attach-session|new|new-session)
+        # The tmux server may have been started from another sandbox (or
+        # none), so say which sandbox this session is for. The empty
+        # SANDBOX_DIR makes each shell in the session set itself up.
+        command tmux new-session -A -s "${SANDBOX}" -c "${SANDBOX_DIR}" \
+          -e "SANDBOX=${SANDBOX}" -e "SANDBOX_DIR="
+        ;;
+      *)
+        command tmux "$@"
+        ;;
+    esac
+  }
 fi
