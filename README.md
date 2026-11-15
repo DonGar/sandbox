@@ -90,6 +90,15 @@ project.
   * The tmux server keeps the environment of the shell that first started it.
     If that was a sandbox shell, variables it exported (from .sandbox) are
     also visible in the tmux sessions of other sandboxes.
+* Claude Code: 'claude' is wrapped, inside and outside sandboxes, so that
+  starting a session first runs 'claude update'. If the update fails, the
+  session isn't started.
+  * Inside a sandbox, the session is also started with CLAUDE_SESSION_TITLE
+    set to the sandbox name, and with '--remote-control *sandbox_name*'
+    (unless you pass --remote-control yourself).
+  * Subcommands ('claude mcp list', ...) and non-interactive runs (--print,
+    --help, --version) are passed through unchanged, and 'command claude'
+    always gets you plain claude.
 
 Since you exit the shell when you exit the sandbox, none of these changes will
 stick around longer than needed.

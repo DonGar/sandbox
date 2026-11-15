@@ -77,6 +77,54 @@ _g()
 complete -F _g g
 
 #
+# Wrapper for starting Claude Code sessions: update first, then start. Inside
+# a sandbox, name the session after the sandbox and turn on Remote Control
+# under that name.
+#
+# Subcommands ('claude mcp ...', 'claude update', ...) and non-interactive
+# runs (--print, --help, --version) go to claude unchanged.
+#
+function claude {
+  local arg
+  local remote=()
+
+  case "${1}" in
+    agents|attach|auth|auto-mode|doctor|gateway|import|install|logs|mcp|\
+    plugin|plugins|purge|respawn|rm|setup-token|stop|kill|ultrareview|\
+    update|upgrade)
+      command claude "$@"
+      return
+      ;;
+  esac
+
+  for arg in "$@"; do
+    case "${arg}" in
+      -p|--print|-h|--help|-v|--version)
+        command claude "$@"
+        return
+        ;;
+    esac
+  done
+
+  command claude update || return
+
+  if [ -z "${SANDBOX}" ]; then
+    command claude "$@"
+    return
+  fi
+
+  # Leave Remote Control alone if it was asked for explicitly.
+  remote=(--remote-control "${SANDBOX}")
+  for arg in "$@"; do
+    case "${arg}" in
+      --remote-control|--remote-control=*) remote=() ;;
+    esac
+  done
+
+  CLAUDE_SESSION_TITLE="${SANDBOX}" command claude "${remote[@]}" "$@"
+}
+
+#
 # Setup done once, in the nested shell started by 'g'.
 #
 if [[ -n "${SANDBOX}" && -z "${SANDBOX_DIR}" ]]; then
